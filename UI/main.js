@@ -43,18 +43,26 @@ $(function() {
 	};
 
 	function initializeMap() {
+		map = L
+			.map('map-view')
+			.setView([51.505, -0.09], 13);
+		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		}).addTo(map);
 
-		mapboxgl.accessToken = 'pk.eyJ1IjoiYWxpYXNocmFmIiwiYSI6ImNqdXl5MHV5YTAzNXI0NG51OWFuMGp4enQifQ.zpd2gZFwBTRqiapp1yci9g';
 
-		map = new mapboxgl.Map({
-			container: 'map-view',
-			style: 'mapbox://styles/aliashraf/ck6lw9nr80lvo1ipj8zovttdx',
-			center: [-73.983652, 40.755024], 
-			zoom: 12
-		});
+		// mapboxgl.accessToken = 'pk.eyJ1IjoiYWxpYXNocmFmIiwiYSI6ImNqdXl5MHV5YTAzNXI0NG51OWFuMGp4enQifQ.zpd2gZFwBTRqiapp1yci9g';
 
-		geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken });
-		var control = map.addControl(geocoder);
+		// map = new mapboxgl.Map({
+		// 	container: 'map-view',
+		// 	style: 'mapbox://styles/aliashraf/ck6lw9nr80lvo1ipj8zovttdx',
+		// 	center: [-73.983652, 40.755024], 
+		// 	zoom: 12
+		// });
+
+		// geocoder = new MapboxGeocoder({ accessToken: mapboxgl.accessToken });
+		// var control = map.addControl(geocoder);
 	}
 
 	function initializeMaterialize() {
@@ -120,21 +128,21 @@ $(function() {
 
 	function initializeRectangleTool() {
 		
-		var modes = MapboxDraw.modes;
-		modes.draw_rectangle = DrawRectangle.default;
+		// var modes = MapboxDraw.modes;
+		// modes.draw_rectangle = DrawRectangle.default;
 
-		draw = new MapboxDraw({
-			modes: modes
-		});
-		map.addControl(draw);
+		// draw = new MapboxDraw({
+		// 	modes: modes
+		// });
+		// map.addControl(draw);
 
-		map.on('draw.create', function (e) {
-			M.Toast.dismissAll();
-		});
+		// map.on('draw.create', function (e) {
+		// 	M.Toast.dismissAll();
+		// });
 
-		$("#rectangle-draw-button").click(function() {
-			startDrawing();
-		})
+		// $("#rectangle-draw-button").click(function() {
+		// 	startDrawing();
+		// })
 
 	}
 
@@ -193,12 +201,12 @@ $(function() {
 		return (180/Math.PI*Math.atan(0.5*(Math.exp(n)-Math.exp(-n))));
 	}
 
+	// Creates a tile rectangle based on zoom
 	function getTileRect(x, y, zoom) {
-
-		var c1 = new mapboxgl.LngLat(tile2long(x, zoom), tile2lat(y, zoom));
-		var c2 = new mapboxgl.LngLat(tile2long(x + 1, zoom), tile2lat(y + 1, zoom));
-
-		return new mapboxgl.LngLatBounds(c1, c2);
+		// var c1 = new mapboxgl.LngLat(tile2long(x, zoom), tile2lat(y, zoom));
+		// var c2 = new mapboxgl.LngLat(tile2long(x + 1, zoom), tile2lat(y + 1, zoom));
+		// return new mapboxgl.LngLatBounds(c1, c2);
+		return null;
 	}
 
 	function getMinZoom() {
@@ -232,35 +240,26 @@ $(function() {
 	}
 
 	function isTileInSelection(tileRect) {
-
-		var polygon = getPolygonByBounds(tileRect);
-
-		var areaPolygon = draw.getAll().features[0];
-
-		if(turf.booleanDisjoint(polygon, areaPolygon) == false) {
-			return true;
-		}
-
+		// var polygon = getPolygonByBounds(tileRect);
+		// var areaPolygon = draw.getAll().features[0];
+		// if(turf.booleanDisjoint(polygon, areaPolygon) == false) {
+		// 	return true;
+		// }
 		return false;
 	}
 
 	function getBounds() {
-
-		var coordinates = draw.getAll().features[0].geometry.coordinates[0];
-
-		var bounds = coordinates.reduce(function(bounds, coord) {
-			return bounds.extend(coord);
-		}, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-
-		return bounds;
+		// var coordinates = draw.getAll().features[0].geometry.coordinates[0];
+		// var bounds = coordinates.reduce(function(bounds, coord) {
+		// 	return bounds.extend(coord);
+		// }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+		// return bounds;
+		return map.getBounds();
 	}
 
 	function getGrid(zoomLevel) {
-
 		var bounds = getBounds();
-
 		var rects = [];
-
 		var outputScale = $("#output-scale").val();
 		//var thisZoom = zoomLevel - (outputScale-1)
 		var thisZoom = zoomLevel
@@ -272,18 +271,15 @@ $(function() {
 
 		for(var y = TY; y <= BY; y++) {
 			for(var x = LX; x <= RX; x++) {
-
-				var rect = getTileRect(x, y, thisZoom);
-
-				if(isTileInSelection(rect)) {
+				// var rect = getTileRect(x, y, thisZoom);
+				// if(isTileInSelection(rect)) {
 					rects.push({
 						x: x,
 						y: y,
 						z: thisZoom,
-						rect: rect,
+						// rect: rect,
 					});
-				}
-
+				// }
 			}
 		}
 
@@ -341,33 +337,29 @@ $(function() {
 	}
 
 	function previewRect(rectInfo) {
-
-		var array = getArrayByBounds(rectInfo.rect);
-
+		// var array = getArrayByBounds(rectInfo.rect);
 		var id = "temp-" + rectInfo.x + '-' + rectInfo.y + '-' + rectInfo.z;
-
-		map.addLayer({
-			'id': id,
-			'type': 'line',
-			'source': {
-				'type': 'geojson',
-				'data': turf.polygon([array]),
-			},
-			'layout': {},
-			'paint': {
-				"line-color": "#ff9f1a",
-				"line-width": 3,
-			}
-		});
-
+		// map.addLayer({
+		// 	'id': id,
+		// 	'type': 'line',
+		// 	'source': {
+		// 		'type': 'geojson',
+		// 		'data': turf.polygon([array]),
+		// 	},
+		// 	'layout': {},
+		// 	'paint': {
+		// 		"line-color": "#ff9f1a",
+		// 		"line-width": 3,
+		// 	}
+		// });
 		return id;
 	}
 
 	function removeLayer(id) {
-		if(map.getSource(id) != null) {
-			map.removeLayer(id);
-			map.removeSource(id);
-		}
+		// if(map.getSource(id) != null) {
+		// 	map.removeLayer(id);
+		// 	map.removeSource(id);
+		// }
 	}
 
 	function generateQuadKey(x, y, z) {
@@ -424,11 +416,11 @@ $(function() {
 	}
 
 	async function startDownloading() {
-
-		if(draw.getAll().features.length == 0) {
-			M.toast({html: 'You need to select a region first.', displayLength: 3000})
-			return;
-		}
+		// Current view is downloaded
+		// if(draw.getAll().features.length == 0) {
+		// 	M.toast({html: 'You need to select a region first.', displayLength: 3000})
+		// 	return;
+		// }
 
 		cancellationToken = false; 
 		requests = [];
