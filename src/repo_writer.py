@@ -5,9 +5,10 @@ from os.path import isfile, join
 import multiprocessing
 from PIL import Image
 import io
-from utils import Utils
 
-from mbtiles_writer import MbtilesWriter
+from .utils import Utils
+from .mbtiles_writer import MbtilesWriter
+
 
 class RepoWriter(MbtilesWriter):
 

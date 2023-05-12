@@ -1,11 +1,14 @@
-import sqlite3
+import io
+import multiprocessing
 import os
+import sqlite3
 from os import listdir
 from os.path import isfile, join
-import multiprocessing
+
 from PIL import Image
-import io
-from utils import Utils
+
+from .utils import Utils
+
 
 class MbtilesWriter:
 	
